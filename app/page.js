@@ -1,22 +1,22 @@
-import { supabase } from "@/lib/supabase";
-import Link from "next/link";
+import Link from 'next/link';
+import { getAllTopics } from '@/lib/data';
+
+export const revalidate = 3600;
 
 export default async function HomePage() {
-  const { data } = await supabase
-    .from("md_topics")
-    .select("slug, title")
-    .order("title");
+  const topics = await getAllTopics();
 
   return (
     <>
       <h1>Money Directory</h1>
-      <ul>
-        {data?.map(item => (
-          <li key={item.slug}>
-            <Link href={`/${item.slug}`}>{item.title}</Link>
-          </li>
+      <div className='grid'>
+        {topics.map(t => (
+          <Link key={t.slug} href={`/${t.slug}`} className='card'>
+            <h2>{t.title}</h2>
+            <p>{t.links.length} resources</p>
+          </Link>
         ))}
-      </ul>
+      </div>
     </>
   );
 }

@@ -1,29 +1,37 @@
-import { supabase } from "@/lib/supabase";
+import { getAllTopics, getTopic } from '@/lib/data';
+
+export const revalidate = 3600;
 
 export async function generateStaticParams() {
-  const { data } = await supabase.from("md_topics").select("slug");
-  return data?.map(r => ({ slug: r.slug })) || [];
+  const topics = await getAllTopics();
+  return topics.map(t => ({ slug: t.slug }));
+}
+
+export async function generateMetadata({ params }) {
+  const topic = await getTopic(params.slug);
+  if (!topic) return {};
+  return {
+    title: `${topic.title} ? Money Directory`,
+    description: `Curated list of ${topic.links.length} ${topic.title} resources`
+  };
 }
 
 export default async function TopicPage({ params }) {
-  const { data } = await supabase
-    .from("md_topics")
-    .select("*")
-    .eq("slug", params.slug)
-    .single();
-
-  if (!data) return <p>Not found</p>;
+  const topic = await getTopic(params.slug);
+  if (!topic) return null;
 
   return (
     <>
-      <h1>{data.title}</h1>
-      <ul>
-        {data.links?.map((l, i) => (
-          <li key={i}>
-            <a href={l.url} target="_blank">{l.title}</a>
-          </li>
+      <h1>{topic.title}</h1>
+      <div className='grid'>
+        {topic.links.map((item, i) => (
+          <article key={i} className='card'>
+            <h2>{item.title}</h2>
+            <p>{item.description}</p>
+            <a href={item.url} target='_blank' rel='nofollow noopener'>Visit ?</a>
+          </article>
         ))}
-      </ul>
+      </div>
     </>
   );
 }
