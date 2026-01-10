@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { getAllTopics } from '@/lib/data';
 
 export const revalidate = 3600;
@@ -9,14 +8,18 @@ export default async function HomePage() {
   return (
     <>
       <h1>Money Directory</h1>
-      <div className='grid'>
-        {topics.map(t => (
-          <Link key={t.slug} href={`/${t.slug}`} className='card'>
-            <h2>{t.title}</h2>
-            <p>{t.links.length} resources</p>
-          </Link>
-        ))}
-      </div>
+      {topics.map(t => (
+        <section key={t.slug} style={{ marginBottom: '2rem' }}>
+          <h2>{t.title}</h2>
+          <ul>
+            {t.links.map((l, i) => (
+              <li key={i}>
+                <a href={`/${t.slug}/${l.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>{l.title}</a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
     </>
   );
 }
