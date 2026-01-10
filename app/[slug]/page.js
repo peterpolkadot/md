@@ -10,6 +10,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }) {
   const topic = await getTopic(params.slug);
   if (!topic) return {};
+
   return {
     title: `${topic.title} ? Money Directory`,
     description: `Curated list of ${topic.links.length} ${topic.title} resources`
